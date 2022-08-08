@@ -177,6 +177,10 @@ public class AdMob extends org.godotengine.godot.plugin.GodotPlugin {
 
         signals.add(new SignalInfo("user_earned_rewarded", String.class, Integer.class));
 
+        signals.add(new SignalInfo("banner_paid", Float.class, String.class));
+        signals.add(new SignalInfo("interstitial_paid", Float.class, String.class));
+        signals.add(new SignalInfo("rewarded_ad_paid", Float.class, String.class));
+
         return signals;
     }
 
@@ -404,6 +408,8 @@ public class AdMob extends org.godotengine.godot.plugin.GodotPlugin {
                     }
                 });
 
+                aAdView.setOnPaidEventListener(adValue -> emitSignal("banner_paid", adValue.getValueMicros() / 1000000f, adValue.getCurrencyCode()));
+
                 aGodotLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
                 if (pPosition == 0)//BOTTOM
                 {
@@ -545,6 +551,8 @@ public class AdMob extends org.godotengine.godot.plugin.GodotPlugin {
                                 emitSignal("interstitial_opened");
                             }
                         });
+
+                        interstitialAd.setOnPaidEventListener(adValue -> emitSignal("interstitial_paid", adValue.getValueMicros() / 1000000f, adValue.getCurrencyCode()));
                     }
 
                     @Override
@@ -585,6 +593,7 @@ public class AdMob extends org.godotengine.godot.plugin.GodotPlugin {
                     @Override
                     public void onAdLoaded(@NonNull RewardedAd rewardedAd) {
                         aRewardedAd = rewardedAd;
+                        aRewardedAd.setOnPaidEventListener(adValue -> emitSignal("rewarded_ad_paid", adValue.getValueMicros() / 1000000f, adValue.getCurrencyCode()));
                         emitSignal("rewarded_ad_loaded");
 
                         aIsRewardedLoaded = true;
